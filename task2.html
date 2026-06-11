@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Responsive Form + To-Do List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f4f4;
+    }
+
+    /* Navigation with Flexbox */
+    nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: #333;
+      padding: 10px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 12px;
+    }
+    nav a:hover {
+      background: #555;
+      border-radius: 4px;
+    }
+
+    /* Grid Layout for Content */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .sidebar {
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 5px;
+    }
+
+    .form-area, .todo-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .form-area h2, .todo-container h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .form-area label {
+      font-weight: bold;
+    }
+
+    .form-area input {
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .form-area button {
+      padding: 10px;
+      font-size: 16px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .form-area button:hover { background: #0056b3; }
+
+    .error { color: red; font-size: 13px; }
+
+    /* To-do list styles */
+    .todo-container input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .todo-container button {
+      padding: 8px 12px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .todo-container button:hover { background: #0056b3; }
+    .todo-container ul { list-style: none; padding: 0; }
+    .todo-container li {
+      background: #eee;
+      margin: 5px 0;
+      padding: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 4px;
+    }
+    .remove-btn {
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+    .remove-btn:hover { background: darkred; }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container { grid-template-columns: 1fr; }
+      nav { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#form">Form</a>
+    <a href="#todo">To-Do List</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+  </nav>
+
+  <!-- Content Area -->
+  <div class="container">
+    <div class="sidebar">
+      <h2>Sidebar</h2>
+      <p>This is extra content. On smaller screens, the form and to-do list stack below this.</p>
+    </div>
+
+    <div>
+      <!-- Form Area -->
+      <form class="form-area" id="contactForm">
+        <h2>Responsive Contact Form</h2>
+        
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+        <div id="nameError" class="error"></div>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+        <div id="emailError" class="error"></div>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" required>
+        <div id="passwordError" class="error"></div>
+        
+        <button type="submit">Submit</button>
+      </form>
+
+      <!-- To-do List Area -->
+      <div class="todo-container" id="todo">
+        <h2>To-Do List</h2>
+        <div style="display:flex; gap:10px;">
+          <input id="task" type="text" placeholder="Enter a task" style="flex:1;">
+          <button id="add-btn">Add</button>
+        </div>
+        <ul id="todo-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Form Validation
+    document.getElementById("contactForm").addEventListener("submit", function(e) {
+      let valid = true;
+
+      // Clear previous errors
+      document.getElementById("nameError").textContent = "";
+      document.getElementById("emailError").textContent = "";
+      document.getElementById("passwordError").textContent = "";
+
+      // Name validation
+      const name = document.getElementById("name").value.trim();
+      if (name === "") {
+        document.getElementById("nameError").textContent = "Name is required.";
+        valid = false;
+      }
+
+      // Email validation
+      const email = document.getElementById("email").value.trim();
+      const regex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      if (email === "") {
+        document.getElementById("emailError").textContent = "Email is required.";
+        valid = false;
+      } else if (!regex.test(email)) {
+        document.getElementById("emailError").textContent = "Please enter a valid email address.";
+        valid = false;
+      }
+
+      // Password validation
+      const password = document.getElementById("password").value.trim();
+      if (password === "") {
+        document.getElementById("passwordError").textContent = "Password is required.";
+        valid = false;
+      } else if (password.length < 6) {
+        document.getElementById("passwordError").textContent = "Password must be at least 6 characters.";
+        valid = false;
+      }
+
+      if (!valid) {
+        e.preventDefault(); // Stop form submission
+      }
+    });
+
+    // To-do List DOM Manipulation
+    const list = document.getElementById("todo-list");
+    const input = document.getElementById("task");
+    const addBtn = document.getElementById("add-btn");
+
+    addBtn.addEventListener("click", () => {
+      const taskText = input.value.trim();
+      if (taskText !== "") {
+        const li = document.createElement("li");
+        li.textContent = taskText;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "❌";
+        removeBtn.className = "remove-btn";
+        removeBtn.onclick = () => li.remove();
+
+        li.appendChild(removeBtn);
+        list.appendChild(li);
+        input.value = "";
+      }
+    });
+  </script>
+
+</body>
+</html>
